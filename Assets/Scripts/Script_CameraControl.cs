@@ -1,19 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityEditor.Timeline;
 using UnityEngine;
 
 public class Script_CameraControl : MonoBehaviour
 {
-    public float moveSpeed = 10.0f;
+    public float moveSpeed = 20.0f;
     public float sensitivity = 10.0f;
     public float rotationSpeed = 5.0f;
     public float easingFactor = 10f;
-    public float zoomSpeed = 1000f;
+    public float zoomSpeed = 3000f;
     public Vector3 rotationCenter;
 
     private Vector3 targetPosition;
     private Vector3 initialPosition;
+    private Vector3 targetInitialPosition;
     private Quaternion initialRotation = Quaternion.Euler(0, 0, 0);
 
     private Vector3 previousPosition;
@@ -25,7 +28,7 @@ public class Script_CameraControl : MonoBehaviour
         rotationCenter = Script_EasyLevel.mapCenterVect;
         initialPosition = new Vector3(rotationCenter.x, rotationCenter.y, -10);
 
-
+        targetInitialPosition = target.position;
         transform.position = initialPosition;
         transform.rotation = initialRotation;
 
@@ -64,37 +67,13 @@ public class Script_CameraControl : MonoBehaviour
         {
             transform.position = initialPosition;
             transform.rotation = initialRotation;
+            target.transform.position = targetInitialPosition;
         }
         float horizontal = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
         float vertical = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 
+        target.transform.rotation = transform.rotation;
         transform.Translate(horizontal, vertical, 0);
-
-        /*if (Input.GetMouseButton(2) || Input.GetMouseButtonDown(2))
-        {
-            target.transform.parent = null;
-        }
-        else if (Input.GetAxis("Horizontal") != 0)
-        {
-            target.transform.parent = transform;
-        }
-        else if (Input.GetAxis("Vertical") != 0)
-        {
-            target.transform.parent = transform;
-        }
-        else if (Input.GetAxis("Horizontal") == 0)
-        {
-            target.transform.parent = null;
-        }
-        else if (Input.GetAxis("Vertical") == 0)
-        {
-            target.transform.parent = null;
-        }*/
-
-
-        /*if (Input.GetKey(KeyCode.S))
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y - 1, transform.position.z);
-        }*/
+        target.transform.Translate(horizontal, vertical, 0);
     }
 }
