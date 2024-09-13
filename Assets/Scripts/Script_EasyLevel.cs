@@ -19,11 +19,11 @@ public class Script_EasyLevel : MonoBehaviour
     public static event Action OnFlagRemoved;
     public static event Action<int> OnBombsAllPlaced;
 
-    public static int mapHeight = 11; //actual height of the play area, +2, one for each edge
-    public static int mapWidth = 11; //actual width of the play area, +2, one for each edge
-    public static int mapDepth = 11;
+    public int mapHeight = 11; //actual height of the play area, +2, one for each edge
+    public int mapWidth = 11; //actual width of the play area, +2, one for each edge
+    public int mapDepth = 11;
 
-    public static Vector3 mapCenterVect = new Vector3((mapWidth - 1f) / 2f, (mapHeight - 1f) / 2f, (mapDepth - 1f) / 2f);
+    public static Vector3 mapCenterVect;// = new Vector3((mapWidth - 1f) / 2f, (mapHeight - 1f) / 2f, (mapDepth - 1f) / 2f);
     public int numberOfBombs = 0;
 
     private int nonBombsRevealed = 0;
@@ -60,8 +60,8 @@ public class Script_EasyLevel : MonoBehaviour
         }
     }
 
-    Cell[,,] board = new Cell[mapHeight, mapWidth, mapDepth];
-    int[,,] nearbyBoard = new int[mapHeight, mapWidth, mapDepth];
+    Cell[,,] board;// = new Cell[mapHeight, mapWidth, mapDepth];
+    int[,,] nearbyBoard;// = new int[mapHeight, mapWidth, mapDepth];
 
     public GameObject cellPrefab;
     public GameObject edgePrefab;
@@ -70,6 +70,10 @@ public class Script_EasyLevel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        mapCenterVect = new Vector3((mapWidth - 1f) / 2f, (mapHeight - 1f) / 2f, (mapDepth - 1f) / 2f);
+        board = new Cell[mapHeight, mapWidth, mapDepth];
+        nearbyBoard = new int[mapHeight, mapWidth, mapDepth];
+
         transform.position = mapCenterVect;
         Debug.Log(mapCenterVect);
 
@@ -320,7 +324,7 @@ public class Script_EasyLevel : MonoBehaviour
         if (!board[gridPosition.y, gridPosition.x, gridPosition.z].IsBomb)
             nonBombsRevealed++;
 
-        Debug.Log($"goal: {(mapWidth - 2) * (mapHeight - 2) * (mapDepth - 2) - numberOfBombs}, current: {nonBombsRevealed}, total bombs: {numberOfBombs}");
+        //Debug.Log($"goal: {(mapWidth - 2) * (mapHeight - 2) * (mapDepth - 2) - numberOfBombs}, current: {nonBombsRevealed}, total bombs: {numberOfBombs}");
         if (cellToReveal != null)
         {
             Script_CellPrefab cellComponent = cellToReveal.GetComponent<Script_CellPrefab>();
