@@ -7,12 +7,18 @@ public class Script_SimpleMovement : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float maximumDrift;
     [SerializeField] private string moveDir;
+    [SerializeField] private GameObject checkMark;
+    [SerializeField] private KeyCode keyToCheck;
+    [SerializeField] private int tutorialStage;
+
     private float moveSpeedDeltaTime;
     private Vector3 initialPosition;
+    bool tutorialElementHasBeenChecked = false;
+    private GameObject[] listOfTutorialObjects = null;
     // Start is called before the first frame update
     void Start()
     {
-        moveSpeed = 2f;
+        moveSpeed = 50f;
         moveSpeedDeltaTime = Time.deltaTime * moveSpeed;
         moveDir = "+x";
         initialPosition = transform.position;
@@ -24,9 +30,25 @@ public class Script_SimpleMovement : MonoBehaviour
     {
         if(Vector3.Distance(initialPosition, transform.position) > maximumDrift)
             transform.position = initialPosition;
-        else MoveSome(moveDir);
+        else if (!tutorialElementHasBeenChecked)
+            MoveSome(moveDir);
+
+        if (Input.GetKeyDown(keyToCheck) && tutorialElementHasBeenChecked == false)
+        {
+            tutorialElementHasBeenChecked = true;
+            MoveTutorialForward(tutorialStage);
+        }
     }
 
+    void MoveTutorialForward(int tutorialStage)
+    {
+        RevealCheckMark();
+        if (listOfTutorialObjects[tutorialStage] != null)
+        {
+            Instantiate(listOfTutorialObjects[tutorialStage]);
+        }
+        else Debug.Log("no GameObject at that position in the array");
+    }
     void MoveSome(string dir)
     {
         switch (dir)
@@ -52,5 +74,12 @@ public class Script_SimpleMovement : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void RevealCheckMark()
+    {
+        GameObject newCheck = Instantiate(checkMark);
+        newCheck.transform.position = transform.position;
+        newCheck.transform.SetParent(transform);
     }
 }
