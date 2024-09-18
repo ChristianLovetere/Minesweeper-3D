@@ -1,28 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Unity.VisualScripting;
 
-public class Script_SimpleMovement : MonoBehaviour
+public class Script_TutorialElement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed;
     [SerializeField] private float maximumDrift;
     [SerializeField] private string moveDir;
-    [SerializeField] private GameObject checkMark;
-    [SerializeField] private KeyCode keyToCheck;
-    [SerializeField] private int tutorialStage;
+    [SerializeField] private KeyCode[] keysToCheck;
+    [SerializeField] private GameObject nextTutorialElement;
+    private GameObject tutorialParent;
+    [SerializeField] private Vector3 spawnLocation;
 
+    private GameObject checkMark;
     private float moveSpeedDeltaTime;
     private Vector3 initialPosition;
     bool tutorialElementHasBeenChecked = false;
-    private GameObject[] listOfTutorialObjects = null;
+
     // Start is called before the first frame update
     void Start()
     {
-        moveSpeed = 50f;
+        checkMark = Resources.Load<GameObject>("Prefabs/GameObject_CheckMark");
         moveSpeedDeltaTime = Time.deltaTime * moveSpeed;
-        moveDir = "+x";
         initialPosition = transform.position;
-        maximumDrift = 150f;
+        tutorialParent = GameObject.Find("TUTORIAL:");
     }
 
     // Update is called once per frame
@@ -33,21 +36,39 @@ public class Script_SimpleMovement : MonoBehaviour
         else if (!tutorialElementHasBeenChecked)
             MoveSome(moveDir);
 
-        if (Input.GetKeyDown(keyToCheck) && tutorialElementHasBeenChecked == false)
+        if (AnyRequestedKeyIsPressed() && tutorialElementHasBeenChecked == false)
         {
             tutorialElementHasBeenChecked = true;
-            MoveTutorialForward(tutorialStage);
+            MoveTutorialForward();
         }
     }
 
-    void MoveTutorialForward(int tutorialStage)
+    bool AnyRequestedKeyIsPressed()
+    {
+        foreach (KeyCode key in keysToCheck)
+        {
+            if (Input.GetKeyDown(key))
+                return true;
+        }
+        return false;
+    }
+
+    void MoveTutorialForward()
     {
         RevealCheckMark();
-        if (listOfTutorialObjects[tutorialStage] != null)
+        //RevealCheckMark invokes HandleCheckMarkFadeFinished at the end
+    }
+
+    void HandleCheckMarkFadeFinished()
+    {
+        if (nextTutorialElement != null)
         {
-            Instantiate(listOfTutorialObjects[tutorialStage]);
+            GameObject NTE = Instantiate(nextTutorialElement, spawnLocation, Quaternion.identity, tutorialParent.transform);
+            //NTE.transform.position = spawnLocation;
+            //NTE.transform.SetParent(uiCanvas.transform);
+
         }
-        else Debug.Log("no GameObject at that position in the array");
+        else Debug.Log("no GameObject given for next tutorial element");
     }
     void MoveSome(string dir)
     {
@@ -81,5 +102,11 @@ public class Script_SimpleMovement : MonoBehaviour
         GameObject newCheck = Instantiate(checkMark);
         newCheck.transform.position = transform.position;
         newCheck.transform.SetParent(transform);
+        Script_CheckMark CmScript = newCheck.GetComponent<Script_CheckMark>();
+        if(CmScript != null)
+        {
+            CmScript.OnCheckMarkFadeFinished += HandleCheckMarkFadeFinished;
+        }
+
     }
 }

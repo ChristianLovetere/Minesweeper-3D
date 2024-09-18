@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Script_CheckMark : MonoBehaviour
 {
+    public event Action OnCheckMarkFadeFinished;
     public float fadeDuration = 2.0f; // Duration of the fade in seconds
     private CanvasRenderer objectRenderer;
 
@@ -25,7 +27,7 @@ public class Script_CheckMark : MonoBehaviour
             objectRenderer.SetAlpha(alpha);
             yield return null;
         }
-
-        Destroy(gameObject);
+        Destroy(transform.parent.gameObject);
+        OnCheckMarkFadeFinished?.Invoke();
     }
 }
