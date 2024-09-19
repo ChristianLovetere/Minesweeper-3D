@@ -14,6 +14,8 @@ public class Script_TutorialElement : MonoBehaviour
     private GameObject tutorialParent;
     [SerializeField] private Vector3 spawnLocation;
 
+    public bool iShouldSpawnNext = true;
+
     private GameObject checkMark;
     private float moveSpeedDeltaTime;
     private Vector3 initialPosition;
@@ -33,10 +35,10 @@ public class Script_TutorialElement : MonoBehaviour
     {
         if(Vector3.Distance(initialPosition, transform.position) > maximumDrift)
             transform.position = initialPosition;
-        else if (!tutorialElementHasBeenChecked)
+        else if (!tutorialElementHasBeenChecked && iShouldSpawnNext)
             MoveSome(moveDir);
 
-        if (AnyRequestedKeyIsPressed() && tutorialElementHasBeenChecked == false)
+        if (AnyRequestedKeyIsPressed() && tutorialElementHasBeenChecked == false && iShouldSpawnNext)
         {
             tutorialElementHasBeenChecked = true;
             MoveTutorialForward();
@@ -63,9 +65,8 @@ public class Script_TutorialElement : MonoBehaviour
     {
         if (nextTutorialElement != null)
         {
-            GameObject NTE = Instantiate(nextTutorialElement, spawnLocation, Quaternion.identity, tutorialParent.transform);
-            //NTE.transform.position = spawnLocation;
-            //NTE.transform.SetParent(uiCanvas.transform);
+
+            Instantiate(nextTutorialElement, spawnLocation, Quaternion.identity, tutorialParent.transform);
 
         }
         else Debug.Log("no GameObject given for next tutorial element");
